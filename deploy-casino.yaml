@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: casino-api-deployment
+  labels:
+    app: casino-api
+spec:
+  replicas: 3 # Número de réplicas para alta disponibilidad
+  selector:
+    matchLabels:
+      app: casino-api
+  template:
+    metadata:
+      labels:
+        app: casino-api
+    spec:
+      containers:
+      - name: casino-api
+        image: casino-api:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: casino-api-service
+spec:
+  selector:
+    app: casino-api
+  ports:
+  - protocol: TCP
+    port: 80  # Puerto expuesto fuera del clúster
+    targetPort: 5000 # Puerto interno del contenedor
+  type: LoadBalancer # Exposición externa para pruebas
